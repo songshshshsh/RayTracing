@@ -5,6 +5,7 @@ class Color
 {
 	public:
 		double x,y,z;
+		Color(){x = y = z = 0;}
 		Color(double _x,double _y,double _z):x(_x),y(_y),z(_z){}
 		friend bool operator == (Color& A, Color& B)
 		{
@@ -25,6 +26,10 @@ class Color
 		Color operator -= (Color& A)
 		{
 			return Color(this->x-A.x,this->y-A.y,this->z-A.z);
+		}
+		Color operator * (double decrease)
+		{
+			return Color(this->x*decrease,this->y*decrease,this->z*decrease);
 		}
 };
 

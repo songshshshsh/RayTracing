@@ -58,33 +58,33 @@ Photon Scene::findEndObject(Light& light)
 
 void Scene::RayTracing()
 {
-	for (auto lightSource: lightSources)
+	for (int i = 0;i < lightSources.size();++i)
 	{
-		Light* light = lightSource->emitPhoton();
+		Light light = lightSources[i]->emitPhoton();
 		Photon photon = findEndObject(light);
 		photon.object->addPhoton(photon);
 	}
 	for (int i = 0;i < camera->rows;++i)
 		for (int j = 0;j < camera->cols;++j)
 		{
-			Light* light = camera->getLight(i,j);
+			Light light = camera->getLight(i,j);
 			Photon photon = findEndObject(light);
-			int photonNumber = getPhotonNumber(&photon);
-			camera->image[i][j] = photon.object->colorAt(photon.Point) * 1.0 * photonNumber / Normalizer;
+			int photonNumber = photon.object->photonMap->getPhotonNumber(&photon);
+			camera->image[i][j] = photon.object->colorAt(photon.position) * (1.0 * photonNumber / Normalizer);
 		}
 }
 
 void Scene::save()
 {
-	cv::Mat traceImage(camera->rows,camera->cols,CV_32UF3);
+	cv::Mat traceImage = cv::Mat(camera->rows,camera->cols,CV_32FC3);
 	for (int i = 0;i < traceImage.rows;++i)
 		for (int j = 0;j < traceImage.cols;++j)
 		{	
-			traceImage.at<Vec3f>(i,j)[0] = camera->image[i][j].x;
-			traceImage.at<Vec3f>(i,j)[1] = camera->image[i][j].y;
-			traceImage.at<Vec3f>(i,j)[2] = camera->image[i][j].z;
+			traceImage.at<cv::Vec3f>(i,j)[0] = camera->image[i][j].x;
+			traceImage.at<cv::Vec3f>(i,j)[1] = camera->image[i][j].y;
+			traceImage.at<cv::Vec3f>(i,j)[2] = camera->image[i][j].z;
 		}
 	cv::imshow("window",traceImage);
 	cv::imwrite("result.jpg",traceImage);
-	waitKey(0);
+	cv::waitKey(0);
 }

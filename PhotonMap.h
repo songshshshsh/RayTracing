@@ -8,6 +8,10 @@ class PhotonMap
 {
 	public:
 		int getPhotonNumber(Photon*);
+		void addPhoton(Photon& photon)
+		{
+			photons.push_back(photon);
+		}
 	private:
 		std::vector<Photon> photons;
 };

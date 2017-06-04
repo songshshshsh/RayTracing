@@ -1,10 +1,12 @@
 #include "Object.h"
-
-const Point BackgroundPoint = Point(0,0,-1);
+#include "base.h"
+#include <string>
+#include <cstdlib>
+#include <fstream>
 
 void Object::addPhoton(Photon& photon)
 {
-	this->photonMap.push_back(&photon);
+	this->photonMap->addPhoton(photon);
 }
 
 Point Surface::intersect(Light& light)
@@ -14,18 +16,13 @@ Point Surface::intersect(Light& light)
 	float newX = ((-beginPoint.z + this->z) * dir.x) + beginPoint.x;
 	float newY = ((-beginPoint.z + this->z) * dir.y) + beginPoint.y;
 	if ((newX >= x1) && (newX <= x2) && (newY >= y1) && (newY <= y2))
-		return Point(newX,newY,this->z,this->color);
+		return Point(newX,newY,this->z);
 	else return BackgroundPoint;
 }
 
 Color Surface::colorAt(Point& point)
 {
 	return Color(color[0],color[1],color[2]);
-}
-
-double PointToLine(Point A,Line B)
-{
-	return fabs(A.x * B.a + A.y * B.b + A.z * B.c + B.d)/sqrt(B.a * B.a + B.b * B.b + B.c * B.c);
 }
 
 Point Sphere::intersect(Light& light)
@@ -40,7 +37,7 @@ Point Sphere::intersect(Light& light)
 		double normalize = sqrt(dir.x * dir.x + dir.y * dir.y + 1);
 		double a = dir.x/normalize,b = dir.y/normalize,c = 1/normalize;
 		double distToSphere = sqrt((beginPoint.x - this->x) * (beginPoint.x - this->x) + (beginPoint.y - this->y) * (beginPoint.y - this->y) + (beginPoint.x - this->x) * (beginPoint.x - this->x)*(beginPoint.z - this->z) * (beginPoint.z - this->z) - distOfPoint * distOfPoint) - sqrt(r*r - distOfPoint * distOfPoint);
-		Point intersectPoint(beginPoint.x + a * distToSphere,beginPoint.y + b * distToSphere,beginPoint.z + c * distToSphere,color);
+		Point intersectPoint(beginPoint.x + a * distToSphere,beginPoint.y + b * distToSphere,beginPoint.z + c * distToSphere);
 		return intersectPoint;
 	}
 }
@@ -49,4 +46,50 @@ Color Sphere::colorAt(Point& point)
 {
 	return Color(color[0],color[1],color[2]);
 }
+
+void Surface::init(std::ifstream& fin)
+{
+	std::string temp;
+	fin >> temp;
+	this->x1 = atof(temp.c_str());
+	fin >> temp;
+	this->x2 = atof(temp.c_str());
+	fin >> temp;
+	this->y1 = atof(temp.c_str());
+	fin >> temp;
+	this->y2 = atof(temp.c_str());
+	fin >> temp;
+	this->z = atof(temp.c_str());
+	fin >> temp;
+	this->color[0] = atof(temp.c_str());
+	fin >> temp;
+	this->color[1] = atof(temp.c_str());
+	fin >> temp;
+	this->color[2] = atof(temp.c_str());
+	fin >> temp;
+	if (temp != "end") printf("Wrong Command!\n");
+}
+
+void Sphere::init(std::ifstream& fin)
+{
+	std::string temp;
+	fin >> temp;
+	this->x = atof(temp.c_str());
+	fin >> temp;
+	this->y = atof(temp.c_str());
+	fin >> temp;
+	this->z = atof(temp.c_str());
+	fin >> temp;
+	this->r = atof(temp.c_str());
+	fin >> temp;
+	this->color[0] = atof(temp.c_str());
+	fin >> temp;
+	this->color[1] = atof(temp.c_str());
+	fin >> temp;
+	this->color[2] = atof(temp.c_str());
+	fin >> temp;
+	if (temp != "end") printf("Wrong Command!\n");
+}
+
+
 

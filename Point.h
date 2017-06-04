@@ -10,6 +10,7 @@ class Point
 		{
 			return A.x == B.x && A.y == B.y && A.z == B.z;
 		}
+		Point(){x = y = z = 0;}
 };
 
 class Line
