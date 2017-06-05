@@ -9,21 +9,30 @@
 #include <opencv2/opencv.hpp>
 #include <opencv/cv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <string>
 
 class Object
 {
 	private:
 	public:
+		int name;
+		Object()
+		{
+			photonMap = new PhotonMap();
+		}
 		PhotonMap* photonMap;
-		void addPhoton(Photon&);
+		virtual void addPhoton(Photon&) = 0;
 		virtual Color colorAt(Point&) = 0;
 		virtual Point intersect(Light&) = 0;
+		~Object()
+		{
+			delete photonMap;
+		}
 };
 
 class Surface : public Object
 {
 	public:
-		PhotonMap* photonMap;
 		void addPhoton(Photon&);
 		float x1,x2,y1,y2,z;
 		cv::Vec3f color;
@@ -38,7 +47,6 @@ class Surface : public Object
 class Sphere : public Object
 {
 	public:
-		PhotonMap* photonMap;
 		void addPhoton(Photon&);
 		float x,y,z,r;
 		cv::Vec3f color;

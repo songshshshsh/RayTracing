@@ -3,13 +3,20 @@
 #include <cstdlib>
 #include <fstream>
 
-void Object::addPhoton(Photon& photon)
+void Surface::addPhoton(Photon& photon)
+{
+	this->photonMap->addPhoton(photon);
+}
+
+void Sphere::addPhoton(Photon& photon)
 {
 	this->photonMap->addPhoton(photon);
 }
 
 Surface::Surface()
-{}
+{
+	name = 1;
+}
 
 Point Surface::intersect(Light& light)
 {
@@ -17,8 +24,12 @@ Point Surface::intersect(Light& light)
 	Point dir = light.direction;
 	float newX = ((-beginPoint.z + this->z) * dir.x) + beginPoint.x;
 	float newY = ((-beginPoint.z + this->z) * dir.y) + beginPoint.y;
+	// printf("%f %f\r", newX,newY);
 	if ((newX >= x1) && (newX <= x2) && (newY >= y1) && (newY <= y2))
+	{
+		// printf("ok\n");
 		return Point(newX,newY,this->z);
+	}
 	else return BackgroundPoint;
 }
 
@@ -28,7 +39,9 @@ Color Surface::colorAt(Point& point)
 }
 
 Sphere::Sphere()
-{}
+{
+	name = 2;
+}
 
 Point Sphere::intersect(Light& light)
 {

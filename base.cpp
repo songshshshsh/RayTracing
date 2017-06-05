@@ -1,7 +1,7 @@
 #include "base.h"
 #include <cmath>
 
-const int oo = 0x7fff;
+const int oo = 0x7fffffff;
 
 Point BackgroundPoint = Point(oo,oo,oo);
 

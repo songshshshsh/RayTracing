@@ -18,7 +18,7 @@ clean :
 	rm -f $(OBJECTS) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS) Makefile
-	$(CC) $(ARCH) $(LDFLAGS) $(OBJECTS) -o $@ -std=c++11
+	$(CC) $(ARCH) $(LDFLAGS) $(OBJECTS) -o $@ -std=c++11 -O2
 
 .cpp.o:
-	$(CC) $(CFLAGS) $< -o $@ -std=c++11
+	$(CC) $(CFLAGS) $< -o $@ -std=c++11 -O2

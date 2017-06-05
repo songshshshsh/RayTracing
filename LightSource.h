@@ -2,6 +2,7 @@
 #define LIGHTSOURCE_H
 
 #include "Light.h"
+#include <fstream>
 
 class LightSource
 {
@@ -13,8 +14,10 @@ class LightSource
 class PointLightSource: public LightSource
 {
 	public:
+		PointLightSource(){}
 		PointLightSource(Point&);
 		Light emitPhoton();
+		void init(std::ifstream&);
 	private:
 		Point position;
 };

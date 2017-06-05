@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include <cmath>
+#include <string>
 
 #define pi 3.1415926
 
@@ -23,7 +24,20 @@ Camera::Camera()
 
 Light Camera::getLight(int x,int y)
 {
-	Point direction(tan( (x-320) * fov_w / 640) , tan( (240-y) * fov_h / 480 ),1);
-	Point beginPoint = Point(x-320,240-y,0);
+	Point direction(tan( (x - position.x -320) * fov_w / 640) , tan( (240-position.y-y) * fov_h / 480 ),1);
+	Point beginPoint = position;
 	return Light(beginPoint,direction);
+}
+
+void Camera::init(std::ifstream& fin)
+{
+	std::string temp;
+	fin >> temp;
+	this->position.x = atof(temp.c_str());
+	fin >> temp;
+	this->position.y = atof(temp.c_str());
+	fin >> temp;
+	this->position.z = atof(temp.c_str());
+	fin >> temp;
+	if (temp != "end") printf("Wrong Command!\n");
 }
