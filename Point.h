@@ -13,11 +13,4 @@ class Point
 		Point(){x = y = z = 0;}
 };
 
-class Line
-{
-	public:
-		float a,b,c,d;
-	Line(float _a,float _b,float _c,float _d):a(_a),b(_b),c(_c),d(_d){};
-};
-
 #endif

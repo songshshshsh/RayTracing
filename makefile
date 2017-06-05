@@ -13,6 +13,7 @@ OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=main
 
 all : $(SOURCES) $(EXECUTABLE)
+	rm *.o
 
 clean :
 	rm -f $(OBJECTS) $(EXECUTABLE)

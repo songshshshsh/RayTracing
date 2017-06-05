@@ -24,12 +24,8 @@ Point Surface::intersect(Light& light)
 	Point dir = light.direction;
 	float newX = ((-beginPoint.z + this->z) * dir.x) + beginPoint.x;
 	float newY = ((-beginPoint.z + this->z) * dir.y) + beginPoint.y;
-	// printf("%f %f\r", newX,newY);
 	if ((newX >= x1) && (newX <= x2) && (newY >= y1) && (newY <= y2))
-	{
-		// printf("ok\n");
 		return Point(newX,newY,this->z);
-	}
 	else return BackgroundPoint;
 }
 
@@ -45,17 +41,16 @@ Sphere::Sphere()
 
 Point Sphere::intersect(Light& light)
 {
-	Point beginPoint = light.beginPoint;
-	Point dir = light.direction;
-	Line line(dir.x,dir.y,1,-(dir.x * beginPoint.x + dir.y * beginPoint.y + beginPoint.z));
-	double distOfPoint = PointToLine(Point(x,y,z),line);
+	double distOfPoint = PointToLine(Point(x,y,z),light);
 	if (distOfPoint > r) return BackgroundPoint;
 	else
 	{
-		double normalize = sqrt(dir.x * dir.x + dir.y * dir.y + 1);
-		double a = dir.x/normalize,b = dir.y/normalize,c = 1/normalize;
-		double distToSphere = sqrt((beginPoint.x - this->x) * (beginPoint.x - this->x) + (beginPoint.y - this->y) * (beginPoint.y - this->y) + (beginPoint.x - this->x) * (beginPoint.x - this->x)*(beginPoint.z - this->z) * (beginPoint.z - this->z) - distOfPoint * distOfPoint) - sqrt(r*r - distOfPoint * distOfPoint);
-		Point intersectPoint(beginPoint.x + a * distToSphere,beginPoint.y + b * distToSphere,beginPoint.z + c * distToSphere);
+		double normalize = (light.direction.x * light.direction.x + light.direction.y * light.direction.y + 1);
+		double b = (light.direction.x * (light.beginPoint.x - x) + light.direction.y * (light.beginPoint.y - y) + light.direction.z * (light.beginPoint.z - z));
+		double ToOrigin = (light.beginPoint.x - x) * (light.beginPoint.x - x) + (light.beginPoint.y - y) * (light.beginPoint.y - y) + (light.beginPoint.z - z) * (light.beginPoint.z - z);
+		double c = normalize * (ToOrigin - r * r); 
+		double t = (-b - sqrt(b*b - c))/normalize;
+		Point intersectPoint(light.beginPoint.x + light.direction.x * t,light.beginPoint.y + light.direction.y * t,light.beginPoint.z + light.direction.z * t);
 		return intersectPoint;
 	}
 }

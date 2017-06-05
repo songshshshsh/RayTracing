@@ -2,11 +2,12 @@
 #define BASE_H
 
 #include "Point.h"
+#include "Light.h"
 
 extern Point BackgroundPoint;
 
 extern double dist(Point&,Point&);
 
-extern double PointToLine(Point,Line&);
+extern double PointToLine(Point,Light&);
 
 #endif

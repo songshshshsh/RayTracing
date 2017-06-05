@@ -1,13 +1,18 @@
 #include "base.h"
 #include <cmath>
+#include <cstdio>
 
 const int oo = 0x7fffffff;
 
 Point BackgroundPoint = Point(oo,oo,oo);
 
-double PointToLine(Point A,Line& B)
+double PointToLine(Point A,Light& light)
 {
-	return fabs(A.x * B.a + A.y * B.b + A.z * B.c + B.d)/sqrt(B.a * B.a + B.b * B.b + B.c * B.c);
+	double normal = light.direction.x * light.direction.x + light.direction.y * light.direction.y + light.direction.z * light.direction.z;
+	double t = ((A.x - light.beginPoint.x) * light.direction.x + (A.y - light.beginPoint.y) * light.direction.y +
+		(A.z - light.beginPoint.z) * light.direction.z)/normal;
+	Point Perpandicular = Point(light.beginPoint.x + light.direction.x * t,light.beginPoint.y + light.direction.y * t,light.beginPoint.z + light.direction.z * t);
+	return dist(A,Perpandicular);
 }
 
 double dist(Point& A,Point& B)

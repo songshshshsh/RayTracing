@@ -91,7 +91,7 @@ void Scene::RayTracing()
 {
 	for (int i = 0;i < lightSources.size();++i)
 	{
-		for (int k = 0;k < 1000000;++k)
+		for (int k = 0;k < 5000000;++k)
 		{
 			Light light = lightSources[i]->emitPhoton();
 			// printf("%f %f %f\r",light.direction.x,light.direction.y,light.direction.z);
