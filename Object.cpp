@@ -1,5 +1,4 @@
 #include "Object.h"
-#include "base.h"
 #include <string>
 #include <cstdlib>
 #include <fstream>
@@ -8,6 +7,9 @@ void Object::addPhoton(Photon& photon)
 {
 	this->photonMap->addPhoton(photon);
 }
+
+Surface::Surface()
+{}
 
 Point Surface::intersect(Light& light)
 {
@@ -24,6 +26,9 @@ Color Surface::colorAt(Point& point)
 {
 	return Color(color[0],color[1],color[2]);
 }
+
+Sphere::Sphere()
+{}
 
 Point Sphere::intersect(Light& light)
 {

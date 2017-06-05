@@ -1,5 +1,4 @@
 #include "PhotonMap.h"
-#include "base.h"
 
 const static double radius = 10.0;
 

@@ -1,7 +1,12 @@
+#ifndef BASE_H
+#define BASE_H
+
 #include "Point.h"
 
-Point BackgroundPoint = Point(0,0,-1);
+extern Point BackgroundPoint;
 
-double dist(Point&,Point&);
+extern double dist(Point&,Point&);
 
-double PointToLine(Point,Line&);
+extern double PointToLine(Point,Line&);
+
+#endif

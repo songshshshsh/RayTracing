@@ -2,7 +2,9 @@
 #define PHOTONMAP_H
 
 #include "Photon.h"
+#include "base.h"
 #include <vector>
+
 
 class PhotonMap
 {

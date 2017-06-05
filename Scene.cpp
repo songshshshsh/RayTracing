@@ -53,7 +53,19 @@ void Scene::addLightSource(LightSource* lightSource)
 
 Photon Scene::findEndObject(Light& light)
 {
-
+	Photon nowPhoton;
+	nowPhoton.position = BackgroundPoint;
+	nowPhoton.object = NULL;
+	for (int i = 0;i < objects.size();++i)
+	{
+		Point nowPoint = objects[i]->intersect(light);
+		if (dist(nowPoint,light.beginPoint) < dist(nowPhoton.position,light.beginPoint))
+		{
+			nowPhoton.position = nowPoint;
+			nowPhoton.object = objects[i];
+		}
+	}
+	return nowPhoton;
 }
 
 void Scene::RayTracing()
