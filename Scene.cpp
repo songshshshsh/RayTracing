@@ -7,7 +7,9 @@
 #include <fstream>
 #include "Scene.h"
 
-const static int Normalizer = 10000;
+const static int Normalizer = 100;
+const static int MAX_DEP = 10;
+const static double eps = 1e-5;
 
 Scene::Scene(std::string inputfile)
 {
@@ -80,6 +82,8 @@ Photon Scene::findEndObject(Light& light)
 			nowPhoton.position = nowPoint;
 			// printf("%f %f %f\r",nowPhoton.position.x,nowPhoton.position.y,nowPhoton.position.z);
 			nowPhoton.object = objects[i];
+			nowPhoton.power = light.power;
+			nowPhoton.direction = light.direction;
 		}
 	}
 	// fflush(stdout);
@@ -87,15 +91,78 @@ Photon Scene::findEndObject(Light& light)
 	return nowPhoton;
 }
 
+Photon Scene::getItsFather(Light& light)
+{
+	Photon nowPhoton;
+	int dep = 1;
+	while (1)
+	{
+		nowPhoton = findEndObject(light);
+		if (nowPhoton.object == NULL) break;
+		if (dep > MAX_DEP) break;
+		double prob = std::rand() * 1.0/RAND_MAX;
+		if (nowPhoton.object->diffuse > prob)
+		{
+			return nowPhoton;
+		}
+		else if (nowPhoton.object->diffuse + nowPhoton.object->spec > prob)
+		{
+			//spec;
+			dep += 1;
+			light = light.getSpecLight(nowPhoton.position,nowPhoton.object->getVerticalVector(nowPhoton.position));
+		}
+		else
+		{
+			//reflaction.
+			dep += 1;
+			light = light.getReflLight(nowPhoton.position,nowPhoton.object->getVerticalVector(nowPhoton.position),nowPhoton.object->refln);
+		}
+	}
+	return nowPhoton;
+}
+
+Color Scene::getPointColor(Light& light,int dep)
+{
+	if (dep > MAX_DEP) return Color(0,0,0);
+	Photon photon = findEndObject(light);
+	if (photon.object == NULL)
+	{
+		return Color(0,0,0);
+	}
+	else
+	{
+		Color ret = Color(0,0,0);
+		if (photon.object->diffuse > 0)
+		{
+			int photonNumber = photon.object->photonMap->getPhotonNumber(&photon);
+			// printf("%f %f %f %f\n",photon.object->diffuse,photon.object->colorAt(photon.position).x,photon.object->colorAt(photon.position).y,photon.object->colorAt(photon.position).z);
+			ret += photon.object->diffuse * photon.object->colorAt(photon.position) * (1.0 * photonNumber / Normalizer);	
+			// printf("begin%f %f %f\n", ret.x,ret.y,ret.z);
+		}
+		if (photon.object->spec > 0)
+		{
+			Light light = Light(photon.position,photon.direction).getSpecLight(photon.position,photon.object->getVerticalVector(photon.position));
+			ret += photon.object->spec * getPointColor(light,dep + 1);
+			// printf("end%f %f %f\n", ret.x,ret.y,ret.z);
+		}
+		if (photon.object->reflaction > 0)
+		{
+			Light light = Light(photon.position,photon.direction).getReflLight(photon.position,photon.object->getVerticalVector(photon.position),photon.object->refln);
+			ret += photon.object->reflaction * getPointColor(light,dep + 1);
+		}
+		return ret;
+	}
+}
+
 void Scene::RayTracing()
 {
 	for (int i = 0;i < lightSources.size();++i)
 	{
-		for (int k = 0;k < 5000000;++k)
+		for (int k = 0;k < lightSources[i]->numberOfPhoton;++k)
 		{
 			Light light = lightSources[i]->emitPhoton();
 			// printf("%f %f %f\r",light.direction.x,light.direction.y,light.direction.z);
-			Photon photon = findEndObject(light);
+			Photon photon = getItsFather(light);
 			if (photon.object == NULL) continue;
 			// printf("GG\n");
 			photon.object->addPhoton(photon);
@@ -107,21 +174,14 @@ void Scene::RayTracing()
 	for (int i = 0;i < camera->rows;++i)
 		for (int j = 0;j < camera->cols;++j)
 		{
-			// printf("%d %d\r",i,j);
+			printf("%d\r",i);
 			fflush(stdout);
 			Light light = camera->getLight(i,j);
-			Photon photon = findEndObject(light);
-			if (photon.object == NULL)
-			{
-				camera->image[i][j] = Color(0,0,0);
-			}
-			else
-			{
-				int photonNumber = photon.object->photonMap->getPhotonNumber(&photon);
-				camera->image[i][j] = photon.object->colorAt(photon.position) * (1.0 * photonNumber / Normalizer);
-			}
+			camera->image[i][j] = getPointColor(light,1);
+			// if ((camera->image[i][j].x > eps) || (camera->image[i][j].y > eps) || (camera->image[i][j].z > eps))
+			// 	printf("%f %f %f\n",camera->image[i][j].x,camera->image[i][j].y,camera->image[i][j].z);
 		}
-	printf("hhh\n");
+	// printf("hhh\n");
 }
 
 void Scene::save()

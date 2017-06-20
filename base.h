@@ -6,6 +6,8 @@
 
 extern Point BackgroundPoint;
 
+extern int NumberofPhoton;
+
 extern double dist(Point&,Point&);
 
 extern double PointToLine(Point,Light&);

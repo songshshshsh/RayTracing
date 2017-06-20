@@ -6,8 +6,15 @@
 class Light
 {
 	public:
-		Light(){};
+		Light()
+		{
+			beginPoint = Point();
+			direction = Point();
+		};
 		Light(Point& begin,Point& dir):beginPoint(begin),direction(dir){}
+		Light getSpecLight(Point&,Point);
+		Light getReflLight(Point&,Point,double);
+		double power;
 		Point beginPoint;
 		Point direction;
 	private:

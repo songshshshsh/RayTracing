@@ -19,17 +19,24 @@ class Color
 		{
 			return Color(A.x-B.x,A.y-B.y,A.z-B.z);
 		}
-		Color operator += (Color& A)
+		Color operator += (Color A)
 		{
-			return Color(this->x+A.x,this->y+A.y,this->z+A.z);
+			this->x += this->x + A.x;
+			this->y += this->y + A.y;
+			this->z += this->z + A.z;
+			return *this;
 		}
-		Color operator -= (Color& A)
+		Color operator -= (Color A)
 		{
 			return Color(this->x-A.x,this->y-A.y,this->z-A.z);
 		}
 		Color operator * (double decrease)
 		{
 			return Color(this->x*decrease,this->y*decrease,this->z*decrease);
+		}
+		friend Color operator * (double decrease,Color A)
+		{
+			return Color(A.x*decrease,A.y*decrease,A.z*decrease);
 		}
 };
 

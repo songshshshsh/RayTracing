@@ -8,13 +8,18 @@ class LightSource
 {
 	public:
 		virtual Light emitPhoton() = 0;
+		int numberOfPhoton;
+		double power;
 	private:
 };
 
 class PointLightSource: public LightSource
 {
 	public:
-		PointLightSource(){}
+		PointLightSource()
+		{
+			position = Point();
+		}
 		PointLightSource(Point&);
 		Light emitPhoton();
 		void init(std::ifstream&);

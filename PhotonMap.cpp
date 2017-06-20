@@ -11,3 +11,8 @@ int PhotonMap::getPhotonNumber(Photon* photon)
 			tot += 1;
 	return tot;
 }
+
+// void PhotonMap::getPhotonFlux(Photon* photon)
+// {
+// 	return 
+// }

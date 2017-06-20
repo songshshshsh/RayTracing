@@ -10,12 +10,13 @@ class PhotonMap
 {
 	public:
 		int getPhotonNumber(Photon*);
+		double getPhotonFlux(Photon*){return 0;}
 		void addPhoton(Photon& photon)
 		{
 			// printf("added\n");
 			photons.push_back(photon);
-			if (photons.size() % 100000 == 0)
-				printf("%lu\n",photons.size());
+			// if (photons.size() % 100000 == 0)
+			// 	printf("%lu\n",photons.size());
 		}
 	private:
 		std::vector<Photon> photons;

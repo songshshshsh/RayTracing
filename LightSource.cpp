@@ -3,12 +3,15 @@
 #include <ctime>
 #include <cstdio>
 
-PointLightSource::PointLightSource(Point& point):position(point){}
+PointLightSource::PointLightSource(Point& point):position(point)
+{
+}
 
 Light PointLightSource::emitPhoton()
 {
 	// std::srand(std::time(0));
 	Light light;
+	light.power = power/numberOfPhoton;
 	light.direction = Point(std::rand() * 1.0 /RAND_MAX,std::rand() * 1.0/RAND_MAX,std::rand() * 1.0/RAND_MAX);
 	if (light.direction.z == 0.5)
 		light.direction.z = 1;
@@ -32,4 +35,5 @@ void PointLightSource::init(std::ifstream& fin)
 	this->position.z = atof(temp.c_str());
 	fin >> temp;
 	if (temp != "end") printf("Wrong Command!\n");
+	numberOfPhoton = 100000;
 }

@@ -6,6 +6,8 @@ const int oo = 0x7fffffff;
 
 Point BackgroundPoint = Point(oo,oo,oo);
 
+int NumberofPhoton = 10000000;
+
 double PointToLine(Point A,Light& light)
 {
 	double normal = light.direction.x * light.direction.x + light.direction.y * light.direction.y + light.direction.z * light.direction.z;

@@ -21,9 +21,15 @@ class Object
 			photonMap = new PhotonMap();
 		}
 		PhotonMap* photonMap;
+		double diffuse;
+		double spec;
+		double reflaction;
+		double refln;
 		virtual void addPhoton(Photon&) = 0;
 		virtual Color colorAt(Point&) = 0;
 		virtual Point intersect(Light&) = 0;
+		virtual Point getVerticalVector(Point&) = 0;
+		// virtual Point getParallelVector(Point&) = 0;
 		~Object()
 		{
 			delete photonMap;
@@ -33,14 +39,17 @@ class Object
 class Surface : public Object
 {
 	public:
+		float depth;
 		void addPhoton(Photon&);
-		float x1,x2,y1,y2,z;
+		float a,b,c,d;
 		cv::Vec3f color;
 		Point intersect(Light&);
 		Surface();
 		Color colorAt(Point&);
 		void init(std::ifstream&);
-		Surface(float _x1,float _x2,float _y1,float _y2,float _z,cv::Vec3f _color):x1(_x1),x2(_x2),y1(_y1),y2(_y2),z(_z),color(_color){};
+		Point getVerticalVector(Point&);
+		// Point getParallelVector(Point&);
+		Surface(float _a,float _b,float _c,float _d,float _depth,cv::Vec3f _color):a(_a),b(_b),c(_c),d(_d),depth(_depth),color(_color){};
 	private:
 };
 
@@ -54,6 +63,8 @@ class Sphere : public Object
 		Sphere();
 		Color colorAt(Point&);
 		void init(std::ifstream&);
+		Point getVerticalVector(Point&);
+		// Point getParallelVector(Point&);
 		Sphere(float _x,float _y,float _z,float _r,cv::Vec3f _color):x(_x),y(_y),z(_z),r(_r),color(_color){};
 	private:
 };

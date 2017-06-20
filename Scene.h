@@ -11,8 +11,8 @@
 class Scene
 {
 	private:
-		std::vector<Object*> objects;
 		Camera* camera;
+		std::vector<Object*> objects;
 		std::vector<PhotonMap*> photonMap;
 		std::vector<LightSource*> lightSources;
 	public:
@@ -22,6 +22,8 @@ class Scene
 		void addLightSource(LightSource*);
 		void RayTracing();
 		Photon findEndObject(Light&);
+		Photon getItsFather(Light&);
+		Color getPointColor(Light&,int);
 		void save();
 		~Scene();
 };

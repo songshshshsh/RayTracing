@@ -10,6 +10,8 @@ class Photon
 	public:
 		Point position;
 		Object* object;
+		double power;
+		Point direction;
 	private:
 };
 
