@@ -32,6 +32,10 @@ class Point
 		{
 			return this->x * A.x + this->y * A.y + this->z * A.z;
 		}
+		Point norm()
+		{
+			return Point(x/Veclen(),y/Veclen(),z/Veclen());
+		}
 		Point normz()
 		{
 			return Point(x * 1.0/z,y * 1.0/z,1.0);

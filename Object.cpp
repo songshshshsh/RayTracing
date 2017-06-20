@@ -58,6 +58,11 @@ Point Surface::intersect(Light& light)
 	else return BackgroundPoint; 
 }
 
+bool Surface::inSurface(Point& point)
+{
+	return false;
+}
+
 Color Surface::colorAt(Point& point)
 {
 	return Color(color[0],color[1],color[2]);
@@ -79,15 +84,29 @@ Point Sphere::intersect(Light& light)
 		double ToOrigin = (light.beginPoint.x - x) * (light.beginPoint.x - x) + (light.beginPoint.y - y) * (light.beginPoint.y - y) + (light.beginPoint.z - z) * (light.beginPoint.z - z);
 		double c = normalize * (ToOrigin - r * r); 
 		double t = (-b - sqrt(b*b - c))/normalize;
-		Point intersectPoint(light.beginPoint.x + light.direction.x * t,light.beginPoint.y + light.direction.y * t,light.beginPoint.z + light.direction.z * t);
-		return intersectPoint;
+		if (t > 1e-7)
+		{
+			Point intersectPoint(light.beginPoint.x + light.direction.x * t,light.beginPoint.y + light.direction.y * t,light.beginPoint.z + light.direction.z * t);
+			return intersectPoint;
+		}
+		else
+		{
+			t = (-b + sqrt(b*b - c))/normalize;
+			if (t > 1e-7)
+			{
+				Point intersectPoint(light.beginPoint.x + light.direction.x * t,light.beginPoint.y + light.direction.y * t,light.beginPoint.z + light.direction.z * t);
+				return intersectPoint;
+			}
+			else return BackgroundPoint;
+		}
 	}
 }
 
 Point Sphere::getVerticalVector(Point& hitPoint)
 {
-	double l = hitPoint.Veclen();
-	return Point((hitPoint.x - x)/l,(hitPoint.y - y)/l,(hitPoint.z - z)/l);
+	Point hhh = Point((hitPoint.x - x)/r,(hitPoint.y - y)/r,(hitPoint.z - z)/r).norm();
+	// printf("%f %f %f\n",hhh.x,hhh.y,hhh.z);
+	return hhh;
 }
 
 Color Sphere::colorAt(Point& point)
@@ -106,8 +125,6 @@ void Surface::init(std::ifstream& fin)
 	this->c = atof(temp.c_str());
 	fin >> temp;
 	this->d = atof(temp.c_str());
-	fin >> temp;
-	this->depth = atof(temp.c_str());
 	fin >> temp;
 	this->color[0] = atof(temp.c_str());
 	fin >> temp;
@@ -148,8 +165,80 @@ void Sphere::init(std::ifstream& fin)
 	fin >> temp;
 	this->reflaction = atof(temp.c_str());
 	fin >> temp;
+	this->refln = atof(temp.c_str());
+	fin >> temp;
 	if (temp != "end") printf("Wrong Command!\n");
 }
+
+void Box::addPhoton(Photon& photon)
+{
+	photonMap->addPhoton(photon);
+}
+
+Point Box::intersect(Light& light)
+{
+	Point nowInter = BackgroundPoint;
+	for (int i = 0;i < surfaces.size();++i)
+	{
+		Point inter = surfaces[i].intersect(light);
+		if (dist(inter,light.beginPoint) < dist(nowInter,light.beginPoint))
+			nowInter = inter;
+	}
+	return nowInter;
+}
+
+Color Box::colorAt(Point& point)
+{
+	Surface* surface = inWhichSurface(point);
+	return surface->colorAt(point);
+}
+
+void Box::init(std::ifstream& fin)
+{
+	std::string temp;
+	for (int i = 0;i < 6;++i)
+	{
+		double aa,bb,cc,dd;
+		cv::Vec3f ccolor;
+		fin >> temp;
+		aa = atof(temp.c_str());
+		fin >> temp;
+		bb = atof(temp.c_str());
+		fin >> temp;
+		cc = atof(temp.c_str());
+		fin >> temp;
+		dd = atof(temp.c_str());
+		fin >> temp;
+		ccolor[0] = atof(temp.c_str());
+		fin >> temp;
+		ccolor[1] = atof(temp.c_str());
+		fin >> temp;
+		ccolor[2] = atof(temp.c_str());
+		surfaces.push_back(Surface(aa,bb,cc,dd,ccolor));
+	}
+	fin >> temp;
+	this->diffuse = atof(temp.c_str());
+	fin >> temp;
+	this->spec = atof(temp.c_str());
+	fin >> temp;
+	this->reflaction = atof(temp.c_str());
+	fin >> temp;
+	if (temp != "end") printf("Wrong Command!\n");
+}
+
+Point Box::getVerticalVector(Point& point)
+{
+	return point;
+}
+
+Surface* Box::inWhichSurface(Point& point)
+{
+	for (int i = 0;i < surfaces.size();++i)
+		if (surfaces[i].inSurface(point)) return &surfaces[i];
+	return NULL;
+}
+
+
 
 
 

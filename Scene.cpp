@@ -9,7 +9,6 @@
 
 const static int Normalizer = 100;
 const static int MAX_DEP = 10;
-const static double eps = 1e-5;
 
 Scene::Scene(std::string inputfile)
 {
@@ -115,7 +114,13 @@ Photon Scene::getItsFather(Light& light)
 		{
 			//reflaction.
 			dep += 1;
+			// printf("%f %f %f\n", light.direction.x,light.direction.y,light.direction.z);
+			// printf("%f %f %f\n", nowPhoton.position.x,nowPhoton.position.y,nowPhoton.position.z);
 			light = light.getReflLight(nowPhoton.position,nowPhoton.object->getVerticalVector(nowPhoton.position),nowPhoton.object->refln);
+			Photon tempPhoton = findEndObject(light);
+			// printf("%f %f %f\n", light.direction.x,light.direction.y,light.direction.z);
+			// printf("%f %f %f\n",tempPhoton.position.x,tempPhoton.position.y,tempPhoton.position.z);
+			light = light.getReflLight(tempPhoton.position,tempPhoton.object->getVerticalVector(tempPhoton.position),1.0/tempPhoton.object->refln);
 		}
 	}
 	return nowPhoton;
@@ -148,7 +153,10 @@ Color Scene::getPointColor(Light& light,int dep)
 		if (photon.object->reflaction > 0)
 		{
 			Light light = Light(photon.position,photon.direction).getReflLight(photon.position,photon.object->getVerticalVector(photon.position),photon.object->refln);
+			Photon tempPhoton = findEndObject(light);
+			light = Light(tempPhoton.position,tempPhoton.direction).getReflLight(tempPhoton.position,tempPhoton.object->getVerticalVector(tempPhoton.position),1.0/tempPhoton.object->refln);
 			ret += photon.object->reflaction * getPointColor(light,dep + 1);
+			// printf("%f %f %f\n",ret.x,ret.y,ret.z);
 		}
 		return ret;
 	}

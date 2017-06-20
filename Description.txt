@@ -1,5 +1,5 @@
-Surface 0 0 1 -200 10 1.0 1.0 0.0 1 0 0 end
-Sphere 30 30 100 20 1.0 0 1.0 0 0 1.0 end
+Surface 0 0 1 -200 1.0 1.0 0.0 1 0 0 end
+Sphere 0 0 100 20 0 0 0 0.5 0 0.5 2 end
 PointLightSource 100 100 0 end
 Camera 0 0 0 end
 Run

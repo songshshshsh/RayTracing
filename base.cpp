@@ -4,6 +4,8 @@
 
 const int oo = 0x7fffffff;
 
+double eps = 1e-7;
+
 Point BackgroundPoint = Point(oo,oo,oo);
 
 int NumberofPhoton = 10000000;
