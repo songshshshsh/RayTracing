@@ -84,7 +84,6 @@ namespace kdt
 		{
 			KnnQueue queue(k);
 			knnSearchRecursive(query, root_, queue, k);
-			
 			std::vector<int> indices(queue.size());
 			for (size_t i = 0; i < queue.size(); i++)
 				indices[i] = queue[i].second;
@@ -258,7 +257,6 @@ namespace kdt
 		{
 			if (node == nullptr)
 				return;
-
 			const PointT& train = points_[node->idx];
 
 			const double dist = distance(query, train);
@@ -267,7 +265,6 @@ namespace kdt
 			const int axis = node->axis;
 			const int dir = query[axis] < train[axis] ? 0 : 1;
 			knnSearchRecursive(query, node->next[dir], queue, k);
-
 			const double diff = fabs(query[axis] - train[axis]);
 			if ((int)queue.size() < k || diff < queue.back().first)
 				knnSearchRecursive(query, node->next[!dir], queue, k);

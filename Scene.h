@@ -12,10 +12,10 @@ class Scene
 {
 	private:
 		Camera* camera;
-		std::vector<Object*> objects;
 		std::vector<PhotonMap*> photonMap;
 		std::vector<LightSource*> lightSources;
 	public:
+		std::vector<Object*> objects;
 		Scene(std::string inputfile);
 		void addObject(Object*);
 		void addCamera(Camera*);

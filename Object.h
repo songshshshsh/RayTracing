@@ -9,6 +9,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv/cv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <Eigen/Dense>
 #include <string>
 
 class Object
@@ -82,6 +83,26 @@ class Sphere : public Object
 		// Point getParallelVector(Point&);
 		Sphere(float _x,float _y,float _z,float _r,cv::Vec3f _color):x(_x),y(_y),z(_z),r(_r),color(_color){};
 	private:
+};
+
+class Bezier: public Object
+{
+	public:
+		void addPhoton(Photon&);
+		int n,m;
+		std::vector<std::vector<Point > > P;
+		cv::Vec3f color;
+		Point intersect(Light&);
+		Bezier();
+		Color colorAt(Point&);
+		void init(std::ifstream&);
+		Point getVerticalVector(Point&);
+		// Point getParallelVector(Point&);
+	private:
+		std::vector<std::vector<long long > > C;
+		double getBezierDerive(int,int,double);
+		double getBezier(int,int,double);
+		double getDerivedF(int,int,Eigen::VectorXd&,Light&);
 };
 
 #endif

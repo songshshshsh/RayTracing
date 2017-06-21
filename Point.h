@@ -7,6 +7,8 @@ class Point
 {
 	public:
 		double x,y,z;
+		double u,v;
+		Point(double _x,double _y,double _z,double _u,double _v):x(_x),y(_y),z(_z),u(_u),v(_v){}
 		Point(double _x,double _y,double _z):x(_x),y(_y),z(_z){}
 		friend bool operator == (Point& A, Point& B)
 		{
@@ -28,7 +30,7 @@ class Point
 		{
 			return Point(num * A.x , num * A.y , num * A.z);
 		}
-		double dot(Point& A)
+		double dot(Point A)
 		{
 			return this->x * A.x + this->y * A.y + this->z * A.z;
 		}

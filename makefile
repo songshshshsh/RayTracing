@@ -3,7 +3,7 @@ ARCH=-arch x86_64
 
 SANDBOX_DIR=/usr/local/opt/opencv
 
-INCLUDE_FLAGS=-I$(SANDBOX_DIR)/include
+INCLUDE_FLAGS=-I$(SANDBOX_DIR)/include -I /Users/songshihong/Desktop/CG/eigen/
 
 CFLAGS=-c -Wall $(INCLUDE_FLAGS)
 LDFLAGS= -L$(SANDBOX_DIR)/lib -lopencv_core -lopencv_highgui -lopencv_imgproc
@@ -13,7 +13,6 @@ OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=main
 
 all : $(SOURCES) $(EXECUTABLE)
-	rm *.o
 
 clean :
 	rm -f $(OBJECTS) $(EXECUTABLE)

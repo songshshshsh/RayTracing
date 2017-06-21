@@ -31,6 +31,13 @@ Scene::Scene(std::string inputfile)
 			this->objects.push_back(sphere);
 			sphere->init(fin);
 		}
+		else if (input == "Bezier")
+		{
+			printf("Bezier\n");
+			Bezier* bezier = new Bezier();
+			this->objects.push_back(bezier);
+			bezier->init(fin);
+		}
 		else if (input == "PointLightSource")
 		{
 			printf("PointLightSource\n");
@@ -139,9 +146,9 @@ Color Scene::getPointColor(Light& light,int dep)
 		Color ret = Color(0,0,0);
 		if (photon.object->diffuse > 0)
 		{
-			int photonNumber = photon.object->photonMap->getPhotonNumber(&photon);
+			double flux = photon.object->photonMap->getPhotonFlux(photon);
 			// printf("%f %f %f %f\n",photon.object->diffuse,photon.object->colorAt(photon.position).x,photon.object->colorAt(photon.position).y,photon.object->colorAt(photon.position).z);
-			ret += photon.object->diffuse * photon.object->colorAt(photon.position) * (1.0 * photonNumber / Normalizer);	
+			ret += photon.object->diffuse * photon.object->colorAt(photon.position) * flux;	
 			// printf("begin%f %f %f\n", ret.x,ret.y,ret.z);
 		}
 		if (photon.object->spec > 0)
@@ -168,6 +175,7 @@ void Scene::RayTracing()
 	{
 		for (int k = 0;k < lightSources[i]->numberOfPhoton;++k)
 		{
+			printf("%d\r",k);
 			Light light = lightSources[i]->emitPhoton();
 			// printf("%f %f %f\r",light.direction.x,light.direction.y,light.direction.z);
 			Photon photon = getItsFather(light);
@@ -178,16 +186,18 @@ void Scene::RayTracing()
 			// fflush(stdout);
 		}
 	}
+	for (int i = 0;i < objects.size();++i)
+		objects[i]->photonMap->Balance();
 	printf("finished\n");
 	for (int i = 0;i < camera->rows;++i)
 		for (int j = 0;j < camera->cols;++j)
 		{
-			printf("%d\r",i);
+			// printf("%d\r",i);
 			fflush(stdout);
 			Light light = camera->getLight(i,j);
 			camera->image[i][j] = getPointColor(light,1);
 			// if ((camera->image[i][j].x > eps) || (camera->image[i][j].y > eps) || (camera->image[i][j].z > eps))
-			// 	printf("%f %f %f\n",camera->image[i][j].x,camera->image[i][j].y,camera->image[i][j].z);
+				// printf("%f %f %f\n",camera->image[i][j].x,camera->image[i][j].y,camera->image[i][j].z);
 		}
 	// printf("hhh\n");
 }

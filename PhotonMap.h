@@ -3,6 +3,7 @@
 
 #include "Photon.h"
 #include "base.h"
+#include "kdtree.h"
 #include <vector>
 
 
@@ -10,7 +11,7 @@ class PhotonMap
 {
 	public:
 		int getPhotonNumber(Photon*);
-		double getPhotonFlux(Photon*){return 0;}
+		double getPhotonFlux(Photon&);
 		void addPhoton(Photon& photon)
 		{
 			// printf("added\n");
@@ -18,8 +19,11 @@ class PhotonMap
 			// if (photons.size() % 100000 == 0)
 			// 	printf("%lu\n",photons.size());
 		}
+		void Balance();
 	private:
 		std::vector<Photon> photons;
+		kdt::KDTree<Photon>* kdtree;
+		double BRDF(Photon&);
 };
 
 #endif
