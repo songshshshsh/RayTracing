@@ -34,6 +34,7 @@ namespace kdt
 
 			std::vector<int> indices(points.size());
 			std::iota(std::begin(indices), std::end(indices), 0);
+			// printf("gg\n");
 
 			root_ = buildRecursive(indices.data(), (int)points.size(), 0);
 		}
@@ -160,16 +161,19 @@ namespace kdt
 			const int axis = depth % PointT::DIM;
 			const int mid = (npoints - 1) / 2;
 
+			// printf("gg\n");
 			std::nth_element(indices, indices + mid, indices + npoints, [&](int lhs, int rhs)
 			{
 				return points_[lhs][axis] < points_[rhs][axis];
 			});
 
+			// printf("gg\n");
 			Node* node = new Node();
 			node->idx = indices[mid];
 			node->axis = axis;
 
 			node->next[0] = buildRecursive(indices, mid, depth + 1);
+			// printf("gg\n");
 			node->next[1] = buildRecursive(indices + mid + 1, npoints - mid - 1, depth + 1);
 
 			return node;

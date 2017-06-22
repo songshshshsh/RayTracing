@@ -140,6 +140,8 @@ void Surface::init(std::ifstream& fin)
 	this->diffuse = atof(temp.c_str());
 	fin >> temp;
 	this->spec = atof(temp.c_str());
+	this->diffusen = 0;
+	this->subsurfacen = 0;
 	fin >> temp;
 	this->reflaction = atof(temp.c_str());
 	fin >> temp;
@@ -170,7 +172,11 @@ void Sphere::init(std::ifstream& fin)
 	fin >> temp;
 	this->reflaction = atof(temp.c_str());
 	fin >> temp;
+	this->diffusen = atof(temp.c_str());
+	fin >> temp;
 	this->refln = atof(temp.c_str());
+	fin >> temp;
+	this->subsurfacen = atof(temp.c_str());
 	fin >> temp;
 	if (temp != "end") printf("Wrong Command!\n");
 }
@@ -436,6 +442,8 @@ void Bezier::init(std::ifstream& fin)
 	this->spec = atof(temp.c_str());
 	fin >> temp;
 	this->reflaction = atof(temp.c_str());
+	this->diffusen = 0;
+	this->subsurfacen = 0;
 	fin >> temp;
 	this->refln = atof(temp.c_str());
 	fin >> temp;

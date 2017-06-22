@@ -38,6 +38,12 @@ class Color
 		{
 			return Color(A.x*decrease,A.y*decrease,A.z*decrease);
 		}
+		double& operator [](int i)
+		{
+			if (i == 0) return x;
+			if (i == 1) return y;
+			if (i == 2) return z;
+		}
 };
 
 #endif

@@ -23,8 +23,10 @@ class Object
 		}
 		PhotonMap* photonMap;
 		double diffuse;
+		double diffusen;
 		double spec;
 		double reflaction;
+		double subsurfacen;
 		double refln;
 		virtual void addPhoton(Photon&) = 0;
 		virtual Color colorAt(Point&) = 0;

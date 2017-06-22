@@ -83,8 +83,10 @@ Photon Scene::findEndObject(Light& light)
 	{
 		Point nowPoint = objects[i]->intersect(light);
 		// if (nowPoint.x < 100) printf("get\n");
+		// printf("%f %f %f\n",nowPoint.x,nowPoint.y,nowPoint.z );
 		if (dist(nowPoint,light.beginPoint) < dist(nowPhoton.position,light.beginPoint))
 		{
+			// printf("%d \n", i);
 			nowPhoton.position = nowPoint;
 			// printf("%f %f %f\r",nowPhoton.position.x,nowPhoton.position.y,nowPhoton.position.z);
 			nowPhoton.object = objects[i];
@@ -100,34 +102,76 @@ Photon Scene::findEndObject(Light& light)
 Photon Scene::getItsFather(Light& light)
 {
 	Photon nowPhoton;
+	nowPhoton.power = light.power;
+	// printf("%f \n", nowPhoton.power);
 	int dep = 1;
+	double decrease = 1;
+	Color preColor;
 	while (1)
 	{
+				// printf("gg\n");
 		nowPhoton = findEndObject(light);
+		nowPhoton.color += preColor;
 		if (nowPhoton.object == NULL) break;
 		if (dep > MAX_DEP) break;
 		double prob = std::rand() * 1.0/RAND_MAX;
 		if (nowPhoton.object->diffuse > prob)
 		{
-			return nowPhoton;
+			if (nowPhoton.object->diffusen > prob)
+			{
+				dep += 1;
+				decrease *= nowPhoton.object->diffuse;
+				nowPhoton.color += nowPhoton.object->colorAt(nowPhoton.position) * decrease;
+				preColor = nowPhoton.color;
+				light.direction = Point(std::rand() * 1.0/RAND_MAX,std::rand() * 1.0/RAND_MAX,std::rand() * 1.0/RAND_MAX);
+				if (light.direction.dot(nowPhoton.object->getVerticalVector(nowPhoton.position)) < 0)
+				light.direction = (-1) * light.direction;
+			}
+			else
+			{
+				// if (nowPhoton.color.x != 0) printf("%f %f %f\r",nowPhoton.color.x,nowPhoton.color.y,nowPhoton.color.z);
+				nowPhoton.color += nowPhoton.object->colorAt(nowPhoton.position) * decrease * nowPhoton.object->diffuse;
+				return nowPhoton;
+			}
 		}
 		else if (nowPhoton.object->diffuse + nowPhoton.object->spec > prob)
 		{
 			//spec;
 			dep += 1;
+			decrease *= nowPhoton.object->spec;
+			nowPhoton.color += nowPhoton.object->colorAt(nowPhoton.position) * decrease;
+			preColor = nowPhoton.color;
 			light = light.getSpecLight(nowPhoton.position,nowPhoton.object->getVerticalVector(nowPhoton.position));
 		}
 		else
 		{
 			//reflaction.
-			dep += 1;
-			// printf("%f %f %f\n", light.direction.x,light.direction.y,light.direction.z);
-			// printf("%f %f %f\n", nowPhoton.position.x,nowPhoton.position.y,nowPhoton.position.z);
-			light = light.getReflLight(nowPhoton.position,nowPhoton.object->getVerticalVector(nowPhoton.position),nowPhoton.object->refln);
-			Photon tempPhoton = findEndObject(light);
-			// printf("%f %f %f\n", light.direction.x,light.direction.y,light.direction.z);
-			// printf("%f %f %f\n",tempPhoton.position.x,tempPhoton.position.y,tempPhoton.position.z);
-			light = light.getReflLight(tempPhoton.position,tempPhoton.object->getVerticalVector(tempPhoton.position),1.0/tempPhoton.object->refln);
+			if (nowPhoton.object->subsurfacen > prob)
+			{
+			// 	printf("gg\n");
+			// printf("gg233\n");
+				light.direction = Point(std::rand() * 1.0/RAND_MAX,std::rand() * 1.0/RAND_MAX,std::rand() * 1.0/RAND_MAX);
+				if (light.direction.dot(nowPhoton.object->getVerticalVector(nowPhoton.position)) > 0)
+				light.direction = (-1) * light.direction;
+				Photon tempPhoton = findEndObject(light);
+				light.direction = Point(std::rand() * 1.0/RAND_MAX,std::rand() * 1.0/RAND_MAX,std::rand() * 1.0/RAND_MAX);
+				if (light.direction.dot(tempPhoton.object->getVerticalVector(tempPhoton.position)) < 0)
+				light.direction = (-1) * light.direction;
+			}
+			else
+			{
+				dep += 1;
+				// printf("%f %f %f\n", light.direction.x,light.direction.y,light.direction.z);
+				// printf("%f %f %f\n", nowPhoton.position.x,nowPhoton.position.y,nowPhoton.position.z);
+				decrease *= nowPhoton.object->reflaction;
+				nowPhoton.color += nowPhoton.object->colorAt(nowPhoton.position) * decrease;
+				preColor = nowPhoton.color;
+				light = light.getReflLight(nowPhoton.position,nowPhoton.object->getVerticalVector(nowPhoton.position),nowPhoton.object->refln);
+				Photon tempPhoton = findEndObject(light);
+				// printf("%f %f %f\n", light.direction.x,light.direction.y,light.direction.z);
+				// printf("%f %f %f\n",tempPhoton.position.x,tempPhoton.position.y,tempPhoton.position.z);
+				light = light.getReflLight(tempPhoton.position,tempPhoton.object->getVerticalVector(tempPhoton.position),1.0/tempPhoton.object->refln);
+			}
 		}
 	}
 	return nowPhoton;
@@ -146,9 +190,9 @@ Color Scene::getPointColor(Light& light,int dep)
 		Color ret = Color(0,0,0);
 		if (photon.object->diffuse > 0)
 		{
-			double flux = photon.object->photonMap->getPhotonFlux(photon);
+			Color flux = photon.object->photonMap->getPhotonFlux(photon);
 			// printf("%f %f %f %f\n",photon.object->diffuse,photon.object->colorAt(photon.position).x,photon.object->colorAt(photon.position).y,photon.object->colorAt(photon.position).z);
-			ret += photon.object->diffuse * photon.object->colorAt(photon.position) * flux;	
+			ret += photon.object->diffuse * flux;	
 			// printf("begin%f %f %f\n", ret.x,ret.y,ret.z);
 		}
 		if (photon.object->spec > 0)
@@ -175,7 +219,8 @@ void Scene::RayTracing()
 	{
 		for (int k = 0;k < lightSources[i]->numberOfPhoton;++k)
 		{
-			printf("%d\r",k);
+				// printf("%d\r",k);
+			fflush(stdout);
 			Light light = lightSources[i]->emitPhoton();
 			// printf("%f %f %f\r",light.direction.x,light.direction.y,light.direction.z);
 			Photon photon = getItsFather(light);
@@ -186,19 +231,37 @@ void Scene::RayTracing()
 			// fflush(stdout);
 		}
 	}
+	printf("233\n");
 	for (int i = 0;i < objects.size();++i)
+	{
+		printf("%d %lu\n",i ,objects[i]->photonMap->photons.size());
 		objects[i]->photonMap->Balance();
+	}
 	printf("finished\n");
 	for (int i = 0;i < camera->rows;++i)
 		for (int j = 0;j < camera->cols;++j)
 		{
-			// printf("%d\r",i);
+			printf("%d\r",i);
 			fflush(stdout);
 			Light light = camera->getLight(i,j);
 			camera->image[i][j] = getPointColor(light,1);
 			// if ((camera->image[i][j].x > eps) || (camera->image[i][j].y > eps) || (camera->image[i][j].z > eps))
 				// printf("%f %f %f\n",camera->image[i][j].x,camera->image[i][j].y,camera->image[i][j].z);
 		}
+	double max_c = 0;
+	for (int k = 0;k < 3;++k)
+	{
+		for (int i = 0;i < camera->rows;++i)
+			for (int j = 0;j < camera->cols;++j)
+				if (camera->image[i][j][k] > max_c)
+					max_c = camera->image[i][j][k];
+	}
+	// for (int i = 0;i < 100;++i)
+	// printf("%f %f %f\n", this->objects[0]->photonMap->photons[i].color[0],this->objects[0]->photonMap->photons[i].color[1],this->objects[0]->photonMap->photons[i].color[2]);
+	for (int k = 0;k < 3;++k)
+		for (int i = 0;i < camera->rows;++i)
+			for (int j = 0;j < camera->cols;++j)
+				camera->image[i][j][k] = sqrt(sqrt(camera->image[i][j][k]/max_c));
 	// printf("hhh\n");
 }
 

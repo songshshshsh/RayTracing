@@ -11,7 +11,7 @@ class PhotonMap
 {
 	public:
 		int getPhotonNumber(Photon*);
-		double getPhotonFlux(Photon&);
+		Color getPhotonFlux(Photon&);
 		void addPhoton(Photon& photon)
 		{
 			// printf("added\n");
@@ -20,8 +20,8 @@ class PhotonMap
 			// 	printf("%lu\n",photons.size());
 		}
 		void Balance();
-	private:
 		std::vector<Photon> photons;
+	private:
 		kdt::KDTree<Photon>* kdtree;
 		double BRDF(Photon&);
 };

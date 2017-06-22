@@ -2,6 +2,7 @@
 #define PHOTON_H
 
 #include "Point.h"
+#include "Color.h"
 
 class Object;
 
@@ -11,6 +12,7 @@ class Photon
 		Point position;
 		Object* object;
 		double power;
+		Color color;
 		Point direction;
 		static const int DIM = 3;
 		double operator [](int i) const
