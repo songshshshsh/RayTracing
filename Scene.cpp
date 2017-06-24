@@ -89,13 +89,15 @@ Photon Scene::findEndObject(Light& light)
 	for (int i = 0;i < objects.size();++i)
 	{
 		Point nowPoint = objects[i]->intersect(light);
+			// printf("233%d \n", i);
 		// if (nowPoint.x < 100) printf("get\n");
 		// printf("%f %f %f\n",nowPoint.x,nowPoint.y,nowPoint.z );
+		// printf("%f %f %f\n",light.beginPoint.x,light.beginPoint.y,light.beginPoint.z );
 		if (dist(nowPoint,light.beginPoint) < dist(nowPhoton.position,light.beginPoint))
 		{
 			// printf("%d \n", i);
 			nowPhoton.position = nowPoint;
-			// printf("%f %f %f\r",nowPhoton.position.x,nowPhoton.position.y,nowPhoton.position.z);
+			// printf("%f %f %f\n",nowPhoton.position.x,nowPhoton.position.y,nowPhoton.position.z);
 			nowPhoton.object = objects[i];
 			nowPhoton.power = light.power;
 			nowPhoton.direction = light.direction;
@@ -232,7 +234,7 @@ void Scene::RayTracing()
 		for (int k = 0;k < lightSources[i]->numberOfPhoton;++k)
 		{
 			// if (k % 100000 == 0)
-				// printf("%d\r",k);
+				printf("%d\r",k);
 			fflush(stdout);
 			Light light = lightSources[i]->emitPhoton();
 			// printf("%f %f %f\r",light.direction.x,light.direction.y,light.direction.z);
@@ -256,8 +258,11 @@ void Scene::RayTracing()
 		{
 			printf("%d\r",i);
 			fflush(stdout);
-			Light light = camera->getLight(i,j);
-			camera->image[i][j] = getPointColor(light,1);
+			std::vector<Light> lights = camera->getLight(i,j);
+			double right = 1.0 / lights.size();
+			camera->image[i][j] = Color(0,0,0);
+			for (int k = 0;k < lights.size(); ++k)
+				camera->image[i][j] += right * getPointColor(lights[k],1);
 			// if ((camera->image[i][j].x > eps) || (camera->image[i][j].y > eps) || (camera->image[i][j].z > eps))
 				// printf("%f %f %f\n",camera->image[i][j].x,camera->image[i][j].y,camera->image[i][j].z);
 		}
@@ -272,14 +277,14 @@ void Scene::RayTracing()
 	}
 	printf("%f \n",max_c );
 	// printf("%f %f %f\n",camera->image[109][69][0],camera->image[109][69][1],camera->image[109][69][2] );
-	printf("%f %f %f\n",camera->image[10][220][0],camera->image[10][220][1],camera->image[10][220][2] );
-	printf("%f %f %f\n",camera->image[220][10][0],camera->image[220][10][1],camera->image[220][10][2] );
+	// printf("%f %f %f\n",camera->image[10][220][0],camera->image[10][220][1],camera->image[10][220][2] );
+	// printf("%f %f %f\n",camera->image[220][10][0],camera->image[220][10][1],camera->image[220][10][2] );
 	// for (int i = 0;i < 100;++i)
 	// printf("%f %f %f\n", this->objects[0]->photonMap->photons[i].color[0],this->objects[0]->photonMap->photons[i].color[1],this->objects[0]->photonMap->photons[i].color[2]);
 	for (int k = 0;k < 3;++k)
 		for (int i = 0;i < camera->rows;++i)
 			for (int j = 0;j < camera->cols;++j)
-				camera->image[i][j][k] = ((camera->image[i][j][k] * 10/max_c));
+				camera->image[i][j][k] = ((camera->image[i][j][k]/max_c));
 	// printf("%f %f %f\n",camera->image[120][120][0],camera->image[120][120][1],camera->image[120][120][2] );
 	// printf("%f %f %f\n",camera->image[temp1][temp2][0],camera->image[temp1][temp2][1],camera->image[temp1][temp2][2] );
 	// printf("hhh\n");

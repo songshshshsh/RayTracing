@@ -1,4 +1,5 @@
 #include "Object.h"
+#include "base.h"
 #include <string>
 #include <cstdlib>
 #include <fstream>
@@ -378,66 +379,23 @@ double Bezier::getDerivedF(int i,int j,VectorXd& origin,Light& light)
 {
 	if (j == 0)
 	{
-		if (i == 0)
-			return light.direction.x;
-		if (i == 1)
-			return light.direction.y;
-		if (i == 2)
-			return light.direction.z;
+		return light.direction[i];
 	}
 	else if (j == 1)
 	{
-		if (i == 0)
-		{
-			double temp = 0;
-			for (int p = 0;p <= n;++p)
-				for (int q = 0;q <= m;++q)
-					temp += P[p][q].x * getBezierDerive(p,n,origin[1]) * getBezier(q,m,origin[2]);
-			return -temp;
-		}
-		if (i == 1)
-		{
-			double temp = 0;
-			for (int p = 0;p <= n;++p)
-				for (int q = 0;q <= m;++q)
-					temp += P[p][q].y * getBezierDerive(p,n,origin[1]) * getBezier(q,m,origin[2]);
-			return -temp;
-		}
-		if (i == 2)
-		{
-			double temp = 0;
-			for (int p = 0;p <= n;++p)
-				for (int q = 0;q <= m;++q)
-					temp += P[p][q].z * getBezierDerive(p,n,origin[1]) * getBezier(q,m,origin[2]);
-			return -temp;
-		}
+		double temp = 0;
+		for (int p = 0;p <= n;++p)
+			for (int q = 0;q <= m;++q)
+				temp += P[p][q][i] * getBezierDerive(p,n,origin[1]) * getBezier(q,m,origin[2]);
+		return -temp;
 	}
 	else 
 	{
-		if (i == 0)
-		{
-			double temp = 0;
-			for (int p = 0;p <= n;++p)
-				for (int q = 0;q <= m;++q)
-					temp += P[p][q].x * getBezier(p,n,origin[1]) * getBezierDerive(q,m,origin[2]);
-			return -temp;
-		}
-		if (i == 1)
-		{
-			double temp = 0;
-			for (int p = 0;p <= n;++p)
-				for (int q = 0;q <= m;++q)
-					temp += P[p][q].y * getBezier(p,n,origin[1]) * getBezierDerive(q,m,origin[2]);
-			return -temp;
-		}
-		if (i == 2)
-		{
-			double temp = 0;
-			for (int p = 0;p <= n;++p)
-				for (int q = 0;q <= m;++q)
-					temp += P[p][q].z * getBezier(p,n,origin[1]) * getBezierDerive(q,m,origin[2]);
-			return -temp;
-		}
+		double temp = 0;
+		for (int p = 0;p <= n;++p)
+			for (int q = 0;q <= m;++q)
+				temp += P[p][q][i] * getBezier(p,n,origin[1]) * getBezierDerive(q,m,origin[2]);
+		return -temp;
 	}
 }
 
@@ -506,14 +464,32 @@ Color Bezier::colorAt(Point& point)
 {
 	int col = wangzai.cols * point.v;
 	int row = wangzai.rows * point.u;
+	// printf("%d %d\n",col,row );
 	if (col == wangzai.cols || col == wangzai.cols-1) col = wangzai.cols - 2;
 	if (row == wangzai.rows || row == wangzai.rows-1) row = wangzai.rows - 2;
+	// printf("%d %d\n",col,row );
+	// printf("%f %f %f\n",wangzai.at<cv::Vec3b>(row,col)[0] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[1] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[2] * 1.0/256) ;
 	return Color(wangzai.at<cv::Vec3b>(row,col)[0] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[1] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[2] * 1.0/256) ;
 }
 
 Point Bezier::getVerticalVector(Point& point)
 {
-	return point;
+	Point valueu,valuev;
+	for (int i = 0;i < 3;++i)
+	{
+		valueu[i] = 0;
+		for (int p = 0;p <= n;++p)
+			for (int q = 0;q <= m;++q)
+				valueu[i] += P[p][q][i] * getBezierDerive(p,n,point.u) * getBezier(q,m,point.v);
+	}
+	for (int i = 0;i < 3;++i)
+	{
+		valuev[i] = 0;
+		for (int p = 0;p <= n;++p)
+			for (int q = 0;q <= m;++q)
+				valuev[i] += P[p][q][i] * getBezier(p,n,point.u) * getBezierDerive(q,m,point.v);
+	}
+	return cross(valueu,valuev);
 }
 
 

@@ -14,4 +14,6 @@ extern double dist(Point&,Point&);
 
 extern double PointToLine(Point,Light&);
 
+extern Point cross(Point&,Point&);
+
 #endif

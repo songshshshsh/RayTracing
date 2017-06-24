@@ -11,7 +11,7 @@ class Camera
 	public:
 		int rows,cols;
 		std::vector<std::vector<Color> > image;
-		Light getLight(int,int);
+		std::vector<Light> getLight(int,int);
 		void init(std::ifstream&);
 		Camera();
 	private:

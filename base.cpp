@@ -24,3 +24,8 @@ double dist(Point& A,Point& B)
 	if (A == BackgroundPoint) return oo;
 	return sqrt((A.x-B.x)*(A.x-B.x)+(A.y-B.y)*(A.y-B.y)+(A.z-B.z)*(A.z-B.z));
 }
+
+Point cross(Point& A,Point& B)
+{
+	return Point(A.y * B.z - A.z * B.y, A.z * B.x - A.x * B.z, A.x * B.y - A.y * B.x);
+}
