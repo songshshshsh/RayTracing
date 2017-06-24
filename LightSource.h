@@ -27,4 +27,19 @@ class PointLightSource: public LightSource
 		Point position;
 };
 
+class AreaLightSource: public LightSource
+{
+	public:
+		AreaLightSource()
+		{
+			// position = Point();
+		}
+		AreaLightSource(Point&);
+		Light emitPhoton();
+		void init(std::ifstream&);
+	private:
+		Point pl,pr;
+		double a,b,c,d;
+};
+
 #endif

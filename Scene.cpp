@@ -45,6 +45,13 @@ Scene::Scene(std::string inputfile)
 			this->lightSources.push_back(pointLightSource);
 			pointLightSource->init(fin);
 		}
+		else if (input == "AreaLightSource")
+		{
+			printf("AreaLightSource\n");
+			AreaLightSource* areaLightSource = new AreaLightSource();
+			this->lightSources.push_back(areaLightSource);
+			areaLightSource->init(fin);
+		}
 		else if (input == "Camera")
 		{
 			printf("Camera\n");
@@ -117,6 +124,7 @@ Photon Scene::getItsFather(Light& light)
 		double prob = std::rand() * 1.0/RAND_MAX;
 		if (nowPhoton.object->diffuse > prob)
 		{
+			// printf("diffuse\n");
 			if (nowPhoton.object->diffusen > prob)
 			{
 				dep += 1;
@@ -129,13 +137,16 @@ Photon Scene::getItsFather(Light& light)
 			}
 			else
 			{
+				// printf("233\n");
 				// if (nowPhoton.color.x != 0) printf("%f %f %f\r",nowPhoton.color.x,nowPhoton.color.y,nowPhoton.color.z);
 				nowPhoton.color += nowPhoton.object->colorAt(nowPhoton.position) * decrease * nowPhoton.object->diffuse;
+				// printf("555\n");
 				return nowPhoton;
 			}
 		}
 		else if (nowPhoton.object->diffuse + nowPhoton.object->spec > prob)
 		{
+			// printf("spec\n");
 			//spec;
 			dep += 1;
 			decrease *= nowPhoton.object->spec;
@@ -145,6 +156,7 @@ Photon Scene::getItsFather(Light& light)
 		}
 		else
 		{
+			// printf("reflaction\n");
 			//reflaction.
 			if (nowPhoton.object->subsurfacen > prob)
 			{
@@ -219,6 +231,7 @@ void Scene::RayTracing()
 	{
 		for (int k = 0;k < lightSources[i]->numberOfPhoton;++k)
 		{
+			// if (k % 100000 == 0)
 				// printf("%d\r",k);
 			fflush(stdout);
 			Light light = lightSources[i]->emitPhoton();
@@ -249,6 +262,7 @@ void Scene::RayTracing()
 				// printf("%f %f %f\n",camera->image[i][j].x,camera->image[i][j].y,camera->image[i][j].z);
 		}
 	double max_c = 0;
+	int temp1 = 0,temp2 = 0;
 	for (int k = 0;k < 3;++k)
 	{
 		for (int i = 0;i < camera->rows;++i)
@@ -256,12 +270,18 @@ void Scene::RayTracing()
 				if (camera->image[i][j][k] > max_c)
 					max_c = camera->image[i][j][k];
 	}
+	printf("%f \n",max_c );
+	// printf("%f %f %f\n",camera->image[109][69][0],camera->image[109][69][1],camera->image[109][69][2] );
+	printf("%f %f %f\n",camera->image[10][220][0],camera->image[10][220][1],camera->image[10][220][2] );
+	printf("%f %f %f\n",camera->image[220][10][0],camera->image[220][10][1],camera->image[220][10][2] );
 	// for (int i = 0;i < 100;++i)
 	// printf("%f %f %f\n", this->objects[0]->photonMap->photons[i].color[0],this->objects[0]->photonMap->photons[i].color[1],this->objects[0]->photonMap->photons[i].color[2]);
 	for (int k = 0;k < 3;++k)
 		for (int i = 0;i < camera->rows;++i)
 			for (int j = 0;j < camera->cols;++j)
-				camera->image[i][j][k] = sqrt(sqrt(camera->image[i][j][k]/max_c));
+				camera->image[i][j][k] = ((camera->image[i][j][k] * 10/max_c));
+	// printf("%f %f %f\n",camera->image[120][120][0],camera->image[120][120][1],camera->image[120][120][2] );
+	// printf("%f %f %f\n",camera->image[temp1][temp2][0],camera->image[temp1][temp2][1],camera->image[temp1][temp2][2] );
 	// printf("hhh\n");
 }
 

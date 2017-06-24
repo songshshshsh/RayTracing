@@ -94,6 +94,7 @@ class Bezier: public Object
 		int n,m;
 		std::vector<std::vector<Point > > P;
 		cv::Vec3f color;
+		cv::Mat wangzai = cv::imread("wangzai1.jpg",CV_32FC3);
 		Point intersect(Light&);
 		Bezier();
 		Color colorAt(Point&);
@@ -102,9 +103,11 @@ class Bezier: public Object
 		// Point getParallelVector(Point&);
 	private:
 		std::vector<std::vector<long long > > C;
+		Point BoundingLB,BoundingRT;
 		double getBezierDerive(int,int,double);
 		double getBezier(int,int,double);
 		double getDerivedF(int,int,Eigen::VectorXd&,Light&);
+		bool isInbox(Light& light);
 };
 
 #endif

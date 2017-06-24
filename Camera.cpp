@@ -24,8 +24,16 @@ Camera::Camera()
 
 Light Camera::getLight(int x,int y)
 {
+	bool jingshen = true;
+	double fl = 6;
+	std::vector<Light> result;
 	Point direction(tan( (x - position.x -(width/2)) * fov_w / width) , tan( ((height/2)-position.y-y) * fov_h / height ),1);
+	// direction = fl * direction;
 	Point beginPoint = position;
+	if (jingshen)
+	{
+		result.push_back(Light(beginPoint,direction));
+	}
 	return Light(beginPoint,direction);
 }
 

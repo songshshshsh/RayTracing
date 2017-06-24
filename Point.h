@@ -43,6 +43,12 @@ class Point
 			return Point(x * 1.0/z,y * 1.0/z,1.0);
 		}
 		Point(){x = y = z = 0;}
+		double& operator [](int i)
+		{
+			if (i == 0) return x;
+			if (i == 1) return y;
+			if (i == 2) return z;
+		}
 };
 
 #endif

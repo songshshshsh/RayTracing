@@ -37,27 +37,12 @@ Point Surface::intersect(Light& light)
 	// if ((newX >= x1) && (newX <= x2) && (newY >= y1) && (newY <= y2))
 	// 	return Point(newX,newY,this->z);
 	// else return BackgroundPoint;
-	double eps = 1e-7;
-	double n1,n2,n3;
-	if (c == 0)
-	{
-		if (b == 0)
-		{
-			n2 = n3 = 0;
-			n1 = -d/a;
-		}
-		else
-		{
-			n3 = n1 = 0;
-			n2 = -d/b;
-		}
-	}
-	else
-	{
-		n1 = n2 = 0;
-		n3 = -d/c;
-	}
-	double t = ((n1 - light.beginPoint.x)*a+(n2 - light.beginPoint.y)*b+(n3 - light.beginPoint.z)*c)/(a* light.direction.x+ b* light.direction.y+ c* light.direction.z);
+	if (std::abs(a* light.direction.x+ b* light.direction.y+ c* light.direction.z) < eps)
+		return BackgroundPoint;
+	// printf("%f %f %f\n",light.direction.x,light.direction.y,light.direction.z );
+	// printf("%f %f %f %f\n",a,b,c,d );
+	double t = -(d + a * light.beginPoint.x + b * light.beginPoint.y + c * light.beginPoint.z)/(a* light.direction.x+ b* light.direction.y+ c* light.direction.z);
+	// printf("%f \n",t );
 	if (t > eps)
 		return Point(light.beginPoint.x + t * light.direction.x,light.beginPoint.y + t * light.direction.y,light.beginPoint.z + t * light.direction.z);
 	else return BackgroundPoint; 
@@ -269,69 +254,118 @@ void Bezier::addPhoton(Photon& photon)
 	photonMap->addPhoton(photon);
 }
 
+bool Bezier::isInbox(Light& light)
+{
+	// printf("%f %f %f\n",BoundingLB[0],BoundingLB[1],BoundingLB[2] );
+	// printf("%f %f %f\n",BoundingRT[0],BoundingRT[1],BoundingRT[2] );
+	for (int i = 0;i < 3;++i)
+	{
+		Surface* temp = new Surface(i == 0,i == 1,i == 2,-BoundingLB[i],cv::Vec3f(0,0,0));
+		Point inter = temp->intersect(light);
+		// printf("inter %f %f %f \n",inter[0],inter[1],inter[2]);
+		bool thisinter = true;
+		for (int j = 0;j < 3;++j)
+			if (i != j)
+				if (inter[j] >= BoundingLB[j] || inter[j] <= BoundingRT[j])
+					thisinter = false;
+		if (thisinter) return true;
+	}
+	for (int i = 0;i < 3;++i)
+	{
+		Surface* temp = new Surface(i == 0,i == 1,i == 2,-BoundingRT[i],cv::Vec3f(0,0,0));
+		Point inter = temp->intersect(light);
+		bool thisinter = true;
+		for (int j = 0;j < 3;++j)
+			if (i != j)
+				if (inter[j] >= BoundingLB[j] || inter[j] <= BoundingRT[j])
+					thisinter = false;
+		if (thisinter) return true;
+	}
+	return false;
+}
+
 Point Bezier::intersect(Light& light)
 {
+	// printf("%f %f %f\n", light.direction.x,light.direction.y,light.direction.z);
+	// fflush(stdout);
+	bool WillInter = isInbox(light);
+	// printf("%d\n", int(WillInter));
+	if (!WillInter) return BackgroundPoint;
+	// printf("gg\n");
 	VectorXd origin(3);
 	origin[0] = origin[1] = origin[2] = 0;
 	VectorXd nowPoint(3);
-	nowPoint[0] = 100;
-	nowPoint[1] = 0.5;
-	nowPoint[2] = 0.25;
-	int count = 0;
-	while (1)
+	bool getAns = false;
+	int tot = 0;
+	while (!getAns && tot < 20)
 	{
-		origin = nowPoint;
-		Matrix3d derive;
-		for (int i = 0;i < 3;++i)
-			for (int j = 0;j < 3;++j)
-				derive(i,j) = getDerivedF(i,j,origin,light);
-		// std::cout << derive << std::endl;
-		Matrix3d inverse;
-		bool invertible;
-		double determinant;
-		derive.computeInverseAndDetWithCheck(inverse,determinant,invertible);
-		// std::cout << inverse << std::endl;
-		if(invertible) 
+		nowPoint[0] = std::rand() * 1.0/RAND_MAX;
+		nowPoint[1] = std::rand() * 1.0/RAND_MAX;
+		nowPoint[2] = std::rand() * 1.0/RAND_MAX;
+		int count = 0;
+		while (1)
 		{
-			VectorXd value(3);
-			value[0] = light.beginPoint.x + light.direction.x * nowPoint[0];
-			for (int i = 0;i <= n;++i)
-				for (int j = 0;j <= m;++j)
-					value[0] -= P[i][j].x * getBezier(i,n,nowPoint[1]) * getBezier(j,m,nowPoint[2]);
-			value[1] = light.beginPoint.y + light.direction.y * nowPoint[0];
-			for (int i = 0;i <= n;++i)
-				for (int j = 0;j <= m;++j)
-					value[1] -= P[i][j].y * getBezier(i,n,nowPoint[1]) * getBezier(j,m,nowPoint[2]);
-			value[2] = light.beginPoint.z + light.direction.z * nowPoint[0];
-			for (int i = 0;i <= n;++i)
-				for (int j = 0;j <= m;++j)
-					value[2] -= P[i][j].z * getBezier(i,n,nowPoint[1]) * getBezier(j,m,nowPoint[2]);
-			// std::cout << value << std::endl;
-			if ((pow(value[0],2) + pow(value[1],2) + pow(value[2],2)) <= eps) break;
-			nowPoint = nowPoint - inverse * value;
-			if (count > 20) break;
-			if (nowPoint[1] > 1 || nowPoint[2] > 1 || nowPoint[1] < 0 || nowPoint[2] < 0 || nowPoint[0] < 0)
+			origin = nowPoint;
+			Matrix3d derive;
+			for (int i = 0;i < 3;++i)
+				for (int j = 0;j < 3;++j)
+					derive(i,j) = getDerivedF(i,j,origin,light);
+			// std::cout << derive << std::endl;
+			Matrix3d inverse;
+			bool invertible;
+			double determinant;
+			derive.computeInverseAndDetWithCheck(inverse,determinant,invertible);
+			// std::cout << inverse << std::endl;
+			if(invertible) 
 			{
-				nowPoint[1] = std::rand() * 1.0/RAND_MAX;
-				nowPoint[2] = std::rand() * 1.0/RAND_MAX;
-				nowPoint[0] = std::rand() * 1.0/RAND_MAX;
+				VectorXd value(3);
+				value[0] = light.beginPoint.x + light.direction.x * nowPoint[0];
+				for (int i = 0;i <= n;++i)
+					for (int j = 0;j <= m;++j)
+						value[0] -= P[i][j].x * getBezier(i,n,nowPoint[1]) * getBezier(j,m,nowPoint[2]);
+				value[1] = light.beginPoint.y + light.direction.y * nowPoint[0];
+				for (int i = 0;i <= n;++i)
+					for (int j = 0;j <= m;++j)
+						value[1] -= P[i][j].y * getBezier(i,n,nowPoint[1]) * getBezier(j,m,nowPoint[2]);
+				value[2] = light.beginPoint.z + light.direction.z * nowPoint[0];
+				for (int i = 0;i <= n;++i)
+					for (int j = 0;j <= m;++j)
+						value[2] -= P[i][j].z * getBezier(i,n,nowPoint[1]) * getBezier(j,m,nowPoint[2]);
+				// std::cout << value << std::endl;
+				// printf("%f %f %f\n", nowPoint[0],nowPoint[1],nowPoint[2]);
+				if ((pow(value[0],2) + pow(value[1],2) + pow(value[2],2)) <= eps)
+				{
+					getAns = true;
+					break;
+				}
+				nowPoint = nowPoint - inverse * value;
 				count++;
+				if (count > 20) break;
+				// printf("%f %f %f\n", nowPoint[0],nowPoint[1],nowPoint[2]);
+			}
+			else 
+			{
+				// printf("invertible\n");
+				break;
 			}
 		}
-		else 
-		{
-			printf("invertible\n");
+		if (nowPoint[0] > eps && nowPoint[1] > eps && nowPoint[1] < 1 && nowPoint[2] > eps && nowPoint[2] < 1 && getAns)
 			break;
-		}
+		else getAns = false;
+		tot++;
 	}
-	if (nowPoint[0] > eps && nowPoint[1] > eps && nowPoint[1] < 1 && nowPoint[2] > eps && nowPoint[2] < 1 && count < 20)
+	if (nowPoint[0] > eps && nowPoint[1] > eps && nowPoint[1] < 1 && nowPoint[2] > eps && nowPoint[2] < 1 && getAns)
+	{
+		// printf("%f %f %f\n", nowPoint[0],nowPoint[1],nowPoint[2]);
 		return Point(light.beginPoint.x + nowPoint[0] * light.direction.x,light.beginPoint.y + nowPoint[0] * light.direction.y,light.beginPoint.z + nowPoint[0] * light.direction.z,nowPoint[1],nowPoint[2]);
+	}
 	else return BackgroundPoint;
 }
 
 double Bezier::getBezier(int i,int m,double u)
 {
 	if (i < 0) return 0;
+	if (u < eps || u > 1-eps) return 0;
 	return C[m][i] * pow(u,i) * pow(1-u,m-i);
 }
 
@@ -414,6 +448,12 @@ void Bezier::init(std::ifstream& fin)
 	this->n = atof(temp.c_str());
 	fin >> temp;
 	this->m = atof(temp.c_str());
+	BoundingLB.x = -INT_MAX;
+	BoundingLB.y = -INT_MAX;
+	BoundingLB.z = -INT_MAX;
+	BoundingRT.x = INT_MAX;
+	BoundingRT.y = INT_MAX;
+	BoundingRT.z = INT_MAX;
 	for (int i = 0;i <= n;++i)
 	{
 		std::vector<Point > tempvec;
@@ -428,6 +468,18 @@ void Bezier::init(std::ifstream& fin)
 			fin >> temp;
 			zz = atof(temp.c_str());
 			this->P[i].push_back(Point(xx,yy,zz));
+			if (xx < BoundingRT.x)
+				BoundingRT.x = xx;
+			if (yy < BoundingRT.y)
+				BoundingRT.y = yy;
+			if (zz < BoundingRT.z)
+				BoundingRT.z = zz;
+			if (xx > BoundingLB.x)
+				BoundingLB.x = xx;
+			if (yy > BoundingLB.y)
+				BoundingLB.y = yy;
+			if (zz > BoundingLB.z)
+				BoundingLB.z = zz;
 		}
 	}
 	fin >> temp;
@@ -452,9 +504,11 @@ void Bezier::init(std::ifstream& fin)
 
 Color Bezier::colorAt(Point& point)
 {
-	if (fmod(point.u,0.2) < 0.1) return Color(1,0,0); 
-	if (fmod(point.v,0.2) < 0.1) return Color(0,1,0); 
-	return Color(color[0],color[1],color[2]);
+	int col = wangzai.cols * point.v;
+	int row = wangzai.rows * point.u;
+	if (col == wangzai.cols || col == wangzai.cols-1) col = wangzai.cols - 2;
+	if (row == wangzai.rows || row == wangzai.rows-1) row = wangzai.rows - 2;
+	return Color(wangzai.at<cv::Vec3b>(row,col)[0] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[1] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[2] * 1.0/256) ;
 }
 
 Point Bezier::getVerticalVector(Point& point)
