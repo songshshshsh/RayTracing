@@ -94,7 +94,7 @@ class Bezier: public Object
 		int n,m;
 		std::vector<std::vector<Point > > P;
 		cv::Vec3f color;
-		cv::Mat wangzai = cv::imread("wangzai.bmp",CV_8UC3);
+		cv::Mat wangzai = cv::imread("wangzai.bmp");
 		Point intersect(Light&);
 		Bezier();
 		Color colorAt(Point&);

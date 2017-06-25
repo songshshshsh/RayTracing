@@ -38,7 +38,7 @@ std::vector<Light> Camera::getLight(int x,int y)
 		double sanfenzhipi = pi/3;
 		for (int i = 0;i < 6;++i)
 		{
-			double x1 = 0.01 * sin(sanfenzhipi * i), x2 = 0.01 * cos(sanfenzhipi * i);
+			double x1 = 0.1 * sin(sanfenzhipi * i), x2 = 0.1 * cos(sanfenzhipi * i);
 			beginPoint = Point(x1,x2,0);
 			Point nowDir = direction - beginPoint;
 			// printf("%f %f %f\n", nowDir.x, nowDir.y, nowDir.z );

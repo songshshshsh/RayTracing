@@ -298,7 +298,7 @@ Point Bezier::intersect(Light& light)
 	VectorXd nowPoint(3);
 	bool getAns = false;
 	int tot = 0;
-	while (!getAns && tot < 20)
+	while (!getAns && tot < 200)
 	{
 		nowPoint[0] = std::rand() * 1.0/RAND_MAX;
 		nowPoint[1] = std::rand() * 1.0/RAND_MAX;
@@ -462,15 +462,33 @@ void Bezier::init(std::ifstream& fin)
 
 Color Bezier::colorAt(Point& point)
 {
-	int col = wangzai.cols * point.v;
-	int row = wangzai.rows * point.u;
-	// printf("%d %d\n",col,row );
+	return Color(1.0,0.5,1.0);
+	int col = wangzai.cols * (1-point.u);
+	int row = wangzai.rows * (1-point.v);
+	// printf("%f %f\n",point.u,point.v );
 	if (col == wangzai.cols || col == wangzai.cols-1) col = wangzai.cols - 2;
 	if (row == wangzai.rows || row == wangzai.rows-1) row = wangzai.rows - 2;
 	// printf("%d %d\n",col,row );
-	// printf("%f %f %f\n",wangzai.at<cv::Vec3b>(row,col)[0] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[1] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[2] * 1.0/256) ;
+	// printf("%d %d\n",wangzai.cols,wangzai.rows );
+	// printf("%d %d %d\n",wangzai.at<cv::Vec3b>(row,col)[0],wangzai.at<cv::Vec3b>(row,col)[1],wangzai.at<cv::Vec3b>(row,col)[2]) ;
 	return Color(wangzai.at<cv::Vec3b>(row,col)[0] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[1] * 1.0/256,wangzai.at<cv::Vec3b>(row,col)[2] * 1.0/256) ;
 }
+
+// Color Bezier::colorAt(Point& point)
+// {
+//  int col = wangzai.cols * point.v;
+//  int row = wangzai.rows * point.u;
+//  if (col == wangzai.cols || col == wangzai.cols-1) col = wangzai.cols - 2;
+//  if (row == wangzai.rows || row == wangzai.rows-1) row = wangzai.rows - 2;
+//  int n = wangzai.rows, m = wangzai.cols;
+//  int gg = row * m + col; // + n * wangzai.rows [ * 2]
+//  int aa = wangzai.at<cv::Vec3b>(gg / 3 / m,gg / 3 % m)[gg % 3];
+//  gg += n * m;
+//  int bb = wangzai.at<cv::Vec3b>(gg / 3 / m,gg / 3 % m)[gg % 3];
+//  gg += n * m;
+//  int cc = wangzai.at<cv::Vec3b>(gg / 3 / m,gg / 3 % m)[gg % 3];
+//  return Color(cc * 1.0/256,bb * 1.0/256,aa * 1.0/256) ;
+// }
 
 Point Bezier::getVerticalVector(Point& point)
 {

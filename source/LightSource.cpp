@@ -38,7 +38,7 @@ void PointLightSource::init(std::ifstream& fin)
 	this->power = atof(temp.c_str());
 	fin >> temp;
 	if (temp != "end") printf("Wrong Command!\n");
-	numberOfPhoton = 1000000;
+	numberOfPhoton = 10000000;
 }
 
 Light AreaLightSource::emitPhoton()
@@ -96,5 +96,5 @@ void AreaLightSource::init(std::ifstream& fin)
 	this->power = atof(temp.c_str());
 	fin >> temp;
 	if (temp != "end") printf("Wrong Command!\n");
-	numberOfPhoton = 1000000;
+	numberOfPhoton = 10000000;
 }

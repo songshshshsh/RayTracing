@@ -21,7 +21,7 @@ void PhotonMap::Balance()
 
 Color PhotonMap::getPhotonFlux(Photon& photon)
 {
-	int k = 30;
+	int k = 200;
 	std::vector<int> indices = kdtree->knnSearch(photon, k);
 	// printf("2333\n");
 	double max_r = 0;

@@ -284,7 +284,7 @@ void Scene::RayTracing()
 	for (int k = 0;k < 3;++k)
 		for (int i = 0;i < camera->rows;++i)
 			for (int j = 0;j < camera->cols;++j)
-				camera->image[i][j][k] = ((camera->image[i][j][k]/max_c));
+				camera->image[i][j][k] = (sqrt(camera->image[i][j][k] * 36/max_c));
 	// printf("%f %f %f\n",camera->image[120][120][0],camera->image[120][120][1],camera->image[120][120][2] );
 	// printf("%f %f %f\n",camera->image[temp1][temp2][0],camera->image[temp1][temp2][1],camera->image[temp1][temp2][2] );
 	// printf("hhh\n");

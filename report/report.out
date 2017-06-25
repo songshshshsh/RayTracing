@@ -1,0 +1,13 @@
+\BOOKMARK [1][-]{section.1}{代码简介}{}% 1
+\BOOKMARK [1][-]{section.2}{实验算法}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{光子映射}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{撒光子}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{渲染}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{扩展}{section.2}% 6
+\BOOKMARK [3][-]{subsubsection.2.4.1}{Bezier高次曲面求交}{subsection.2.4}% 7
+\BOOKMARK [3][-]{subsubsection.2.4.2}{贴图/景深}{subsection.2.4}% 8
+\BOOKMARK [3][-]{subsubsection.2.4.3}{渲染加速}{subsection.2.4}% 9
+\BOOKMARK [1][-]{section.3}{实验效果}{}% 10
+\BOOKMARK [2][-]{subsection.3.1}{焦散和次表面折射}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.2}{贴图和景深}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.3}{另一构景}{section.3}% 13
